@@ -1,0 +1,39 @@
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def delNodes(self, root: Optional[TreeNode], to_delete: List[int]) -> List[TreeNode]:
+        # passing info upwards by return value
+        # passing info downwards by arguments
+        to_delete = set(to_delete)
+        res = []
+        self.walk(root, False, res, to_delete)
+        return res
+    
+    def walk(self, root, parent_exist, res, to_delete):
+        if root is None:
+            return None
+        # root.val not root
+        if root.val in to_delete:
+            # actually don't care about the root.left or root.right as root will be removed
+            # the below two lines are good too
+            #self.walk(root.left, False, res, to_delete)
+            #self.walk(root.right, False, res, to_delete)
+            root.left = self.walk(root.left, False, res, to_delete)
+            root.right = self.walk(root.right, False, res, to_delete)
+            
+            # tell its parent node child is deleted 
+            return None
+        else:
+            # put node in the res if parent is removed
+            if not parent_exist:
+                res.append(root)
+            # update the relation of parent and child
+            root.left = self.walk(root.left, True, res, to_delete)
+            root.right = self.walk(root.right, True, res, to_delete)
+            
+            # return node itself, which means the above parent-child relations keep the same
+            return root
